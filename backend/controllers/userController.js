@@ -20,6 +20,17 @@ const registerUser = async (req, res) => {
         return res.status(400).json({ message: 'Please add all fields' });
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        console.error('[Auth Error] Invalid email format.');
+        return res.status(400).json({ message: 'Please provide a valid email address' });
+    }
+
+    if (password.length < 6) {
+        console.error('[Auth Error] Password too short.');
+        return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+    }
+
     try {
         console.log('[Auth Step 3] Checking if user already exists in DB...');
         const userExists = await User.findOne({ email });

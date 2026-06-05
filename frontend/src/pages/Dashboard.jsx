@@ -7,8 +7,12 @@ function Dashboard({ toggleTheme, theme }) {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [tag, setTag] = useState('Work');
+  const [dueDate, setDueDate] = useState('');
+  
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [tagFilter, setTagFilter] = useState('all');
   const [sortPref, setSortPref] = useState(localStorage.getItem('sortPref') || 'desc');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -22,6 +26,8 @@ function Dashboard({ toggleTheme, theme }) {
   const [editTaskId, setEditTaskId] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
+  const [editTag, setEditTag] = useState('Work');
+  const [editDueDate, setEditDueDate] = useState('');
 
   // Feedback State
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
@@ -54,7 +60,7 @@ function Dashboard({ toggleTheme, theme }) {
     if (!user) return;
     try {
       const response = await axios.get(`http://localhost:5000/api/tasks`, {
-        params: { search, status: statusFilter, sort: sortPref, page, limit: 5 },
+        params: { search, status: statusFilter, tag: tagFilter, sort: sortPref, page, limit: 5 },
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setTasks(response.data.tasks);
@@ -63,7 +69,7 @@ function Dashboard({ toggleTheme, theme }) {
     } catch (error) {
       console.error('Failed to fetch tasks:', error.message);
     }
-  }, [user, search, statusFilter, sortPref, page]);
+  }, [user, search, statusFilter, tagFilter, sortPref, page]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -76,11 +82,18 @@ function Dashboard({ toggleTheme, theme }) {
     e.preventDefault();
     if (!title.trim()) return;
     try {
-      await axios.post('http://localhost:5000/api/tasks', { title, description }, {
+      await axios.post('http://localhost:5000/api/tasks', { 
+        title, 
+        description,
+        tag,
+        dueDate: dueDate || null
+      }, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setTitle('');
       setDescription('');
+      setTag('Work');
+      setDueDate('');
       setPage(1); 
       fetchTasks();
       announce('Task added successfully');
@@ -119,6 +132,8 @@ function Dashboard({ toggleTheme, theme }) {
     setEditTaskId(task._id);
     setEditTitle(task.title);
     setEditDescription(task.description || '');
+    setEditTag(task.tag || 'Other');
+    setEditDueDate(task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '');
     setIsEditModalOpen(true);
   };
 
@@ -127,7 +142,12 @@ function Dashboard({ toggleTheme, theme }) {
     if (!editTitle.trim()) return;
     try {
       await axios.put(`http://localhost:5000/api/tasks/${editTaskId}`, 
-        { title: editTitle, description: editDescription }, 
+        { 
+          title: editTitle, 
+          description: editDescription,
+          tag: editTag,
+          dueDate: editDueDate || null
+        }, 
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       setIsEditModalOpen(false);
@@ -150,6 +170,23 @@ function Dashboard({ toggleTheme, theme }) {
     navigate('/login');
   };
 
+  // Gamification Metrics
+  const completedCount = tasks.filter(t => t.status === 'completed').length;
+  const progressRatio = tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0;
+
+  // Visual Urgency Logic
+  const getUrgencyClass = (task) => {
+    if (task.status === 'completed' || !task.dueDate) return '';
+    const now = new Date();
+    const due = new Date(task.dueDate);
+    now.setHours(0,0,0,0);
+    due.setHours(0,0,0,0);
+    
+    if (due < now) return 'task-overdue'; // Past due
+    if (due.getTime() === now.getTime()) return 'task-due-soon'; // Due today
+    return '';
+  };
+
   if (!user) return null;
 
   return (
@@ -167,9 +204,18 @@ function Dashboard({ toggleTheme, theme }) {
           <div className="dashboard-header glass-panel" style={{ padding: '1.5rem' }}>
             <div>
               <h2 className="title-gradient" style={{ fontSize: '1.5rem' }}>{getGreeting()},<br/>{user.name.split(' ')[0]}</h2>
-              <p style={{ color: 'var(--text-secondary)' }}>Manage your day effortlessly</p>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Manage your day effortlessly</p>
+              
+              {/* Gamification Progress Bar */}
+              <div className="progress-container" aria-label={`Progress: ${Math.round(progressRatio)}%`}>
+                <div className="progress-fill" style={{ width: `${progressRatio}%` }}></div>
+              </div>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.25rem', textAlign: 'right' }}>
+                {completedCount} of {tasks.length} completed
+              </p>
             </div>
-            <div className="user-info">
+            
+            <div className="user-info" style={{ marginTop: '0.5rem' }}>
               <button 
                 className="btn-icon" 
                 onClick={toggleTheme} 
@@ -203,9 +249,33 @@ function Dashboard({ toggleTheme, theme }) {
                 value={description} 
                 onChange={(e) => setDescription(e.target.value)} 
                 aria-label="New Task Description"
-                rows="3"
-                style={{ resize: 'vertical', minHeight: '60px' }}
+                rows="2"
+                style={{ resize: 'vertical' }}
               />
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <Dropdown 
+                    value={tag}
+                    onChange={(val) => setTag(val)}
+                    options={[
+                      { value: 'Work', label: 'Work' },
+                      { value: 'Personal', label: 'Personal' },
+                      { value: 'Urgent', label: 'Urgent' },
+                      { value: 'Other', label: 'Other' }
+                    ]}
+                    ariaLabel="Select Tag"
+                  />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <input 
+                    type="date" 
+                    value={dueDate} 
+                    onChange={(e) => setDueDate(e.target.value)} 
+                    aria-label="Due Date"
+                    style={{ width: '100%', padding: '0.75rem 0.5rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
               <button type="submit" className="btn-primary">
                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
                 Add Task
@@ -244,6 +314,18 @@ function Dashboard({ toggleTheme, theme }) {
               ariaLabel="Filter by status"
             />
             <Dropdown 
+              value={tagFilter}
+              onChange={(val) => { setTagFilter(val); setPage(1); }}
+              options={[
+                { value: 'all', label: 'All Tags' },
+                { value: 'Work', label: 'Work' },
+                { value: 'Personal', label: 'Personal' },
+                { value: 'Urgent', label: 'Urgent' },
+                { value: 'Other', label: 'Other' }
+              ]}
+              ariaLabel="Filter by tag"
+            />
+            <Dropdown 
               value={sortPref}
               onChange={(val) => { setSortPref(val); setPage(1); }}
               options={[
@@ -256,19 +338,27 @@ function Dashboard({ toggleTheme, theme }) {
 
           <div className="task-list-container" role="list">
             {tasks.length === 0 ? (
-              <div className="empty-state" style={{ margin: 'auto' }}>
-                <h3 style={{ margin: 0, marginBottom: '0.5rem' }}>No tasks found</h3>
-                <p>You have {totalTasks} total tasks matching this criteria.</p>
+              <div className="empty-state" style={{ margin: 'auto', animation: 'fadeIn 0.5s ease-out' }}>
+                <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.8, marginBottom: '1rem' }}>
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <h3 style={{ margin: 0, marginBottom: '0.5rem' }}>You're all caught up!</h3>
+                <p>Time to relax, or create a new task.</p>
               </div>
             ) : (
               tasks.map((task) => (
-                <div key={task._id} className="task-card glass-panel" role="listitem">
-                  <div className="task-content">
-                    <div className={`task-title ${task.status === 'completed' ? 'completed' : ''}`}>
-                      {task.title}
-                      <span className={`task-status-badge status-${task.status}`} aria-label={`Status: ${task.status}`}>
-                        {task.status}
-                      </span>
+                <div key={task._id} className={`task-card glass-panel task-card-enter ${getUrgencyClass(task)}`} role="listitem">
+                  <div className={`task-content ${task.status === 'completed' ? 'completed' : ''}`}>
+                    <div className="task-title">
+                      <span className="task-title-text">{task.title}</span>
+                      <span className={`task-tag tag-${(task.tag || 'other').toLowerCase()}`}>{task.tag || 'Other'}</span>
+                      {task.dueDate && (
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                          <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                          {new Date(task.dueDate).toLocaleDateString()}
+                        </span>
+                      )}
                     </div>
                     {task.description && <div className="task-desc">{task.description}</div>}
                   </div>
@@ -349,9 +439,33 @@ function Dashboard({ toggleTheme, theme }) {
                 placeholder="Description" 
                 value={editDescription} 
                 onChange={(e) => setEditDescription(e.target.value)} 
-                rows="4"
+                rows="3"
                 aria-label="Edit Task Description"
               />
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <Dropdown 
+                    value={editTag}
+                    onChange={(val) => setEditTag(val)}
+                    options={[
+                      { value: 'Work', label: 'Work' },
+                      { value: 'Personal', label: 'Personal' },
+                      { value: 'Urgent', label: 'Urgent' },
+                      { value: 'Other', label: 'Other' }
+                    ]}
+                    ariaLabel="Edit Tag"
+                  />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <input 
+                    type="date" 
+                    value={editDueDate} 
+                    onChange={(e) => setEditDueDate(e.target.value)} 
+                    aria-label="Edit Due Date"
+                    style={{ width: '100%', padding: '0.75rem 1rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
               <div className="modal-actions">
                 <button type="button" className="btn-outline" onClick={() => setIsEditModalOpen(false)}>Cancel</button>
                 <button type="submit" className="btn-primary">Save Changes</button>

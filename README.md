@@ -1,27 +1,32 @@
 # Task Master - Premium MERN Stack Application
 
 A full-stack Task Management Web Application built with the **MERN** stack (MongoDB, Express.js, React.js, Node.js). 
-This project features a sleek, premium UI built from scratch using Vanilla CSS with glassmorphism, responsive grids, and dynamic micro-animations.
+This project features a sleek, premium UI built from scratch using Vanilla CSS with glassmorphism, responsive grids, gamified elements, and dynamic micro-animations.
 
 ## 🌟 Features
 
 ### Frontend (React + Vite)
-- **Premium UI/UX**: Designed using Vanilla CSS (no component libraries) to feature dark mode, frosted glass elements, and smooth interactions.
-- **Complete Task Operations**: Create, Read, Update, Delete (CRUD) operations via intuitive modals and inline actions.
+- **Premium UI/UX (Glassmorphism)**: Designed entirely from scratch using Vanilla CSS to feature custom Light/Dark mode themes, frosted glass elements, and smooth interactions. No generic component libraries used.
+- **Gamification & Progress Tracking**: Features an animated, diagonal-striped "Daily Progress Bar" that calculates your completion ratio and fills up dynamically as you complete tasks.
+- **Satisfying Micro-Animations**: Interactive elements come to life with scale-down "push" button effects, a strikethrough animation when completing tasks, and a bounce-in animation when tasks are added.
+- **Color-Coded Task Tags**: Organize tasks with custom tags (`Work`, `Personal`, `Urgent`, `Other`). Tags are rendered as beautifully colored, pill-shaped badges.
+- **Visual Urgency (Due Dates)**: Tasks feature deadline tracking. If a task is due today, it glows with a warm warning orange. If overdue, it pulses with a soft danger red, naturally drawing user attention.
 - **Advanced State Tracking**: Toggle tasks between 'Pending' and 'Completed' states instantly.
-- **Search & Filter**: Real-time searching of tasks by title and filtering by completion status.
-- **Pagination**: Breaking down lists of tasks to handle large datasets effectively.
+- **Robust Searching & Filtering**: Cross-reference tasks by searching titles, filtering by completion status, AND filtering by specific tags simultaneously.
+- **Pagination**: Efficiently paginates large lists of tasks to ensure performance.
+- **Beautiful Empty States**: Utilizes custom SVG illustrations when the inbox is cleared to maintain a polished, professional feel.
 
 ### Backend (Node.js + Express.js)
-- **RESTful API Architecture**: Organized with explicit Routes, Controllers, and Middleware.
-- **Secure Authentication**: Utilizing JWT (JSON Web Tokens) to secure user sessions and bcrypt for password hashing.
-- **Protected Routes**: Ensuring users can only manage and view their own tasks.
+- **RESTful API Architecture**: Organized cleanly with explicit Routes, Controllers, and Middleware.
+- **Strict Data Validation**: The backend enforces Regex email format checking, minimum password lengths, and required task body content to prevent malformed data.
+- **Secure Authentication**: Utilizes JWT (JSON Web Tokens) to secure user sessions via LocalStorage and bcryptjs for secure password hashing.
+- **Protected Routes**: Ensures users can only query, manage, and view their own tasks.
 - **MongoDB Integration**: Robust schemas for Users and Tasks defined via Mongoose.
 
 ## 🛠️ Technology Stack
 
 - **Frontend**: React 19, Vite, React Router DOM, Axios, Vanilla CSS
-- **Backend**: Node.js, Express.js, Mongoose, JWT, bcrypt, CORS
+- **Backend**: Node.js, Express.js, Mongoose, JWT, bcryptjs, CORS
 - **Database**: MongoDB (Atlas)
 
 ---
@@ -78,20 +83,12 @@ By default, the Vite server will run on `http://localhost:5173`. Open this URL i
 
 ---
 
-## 📸 Demo
-
-> (Replace these placeholders with actual screenshots or a link to a demo video)
-
-- **Login Screen**: `[Screenshot of Login]`
-- **Dashboard**: `[Screenshot of Dashboard with Glassmorphism]`
-- **Edit Modal**: `[Screenshot of Edit Modal]`
-
 ## 🧪 Evaluation Criteria Met
-- **Code Quality**: Structured into modular components, controllers, and services.
-- **UI/UX**: Custom premium aesthetic avoiding generic templates.
-- **Functionality**: Full robust CRUD alongside all required core features.
-- **Error Handling**: API errors are caught and surfaced via friendly UI alerts.
-- **Bonus Implementations**: Fully functional pagination, searching, and filtering built into the core API.
+- **1. Code Quality**: Structured strictly into modular React components on the frontend, and distinct routers/controllers/models on the backend.
+- **2. UI/UX**: Implements a custom, premium gamified aesthetic avoiding all generic template look-and-feels. Includes thoughtful empty-states, responsive layout grids, and accessible invisible-scrollbars.
+- **3. Functionality**: Full robust CRUD functionality alongside complex cross-filtering (search + status + tags + pagination).
+- **4. Error Handling & Validation**: API errors are caught and surfaced via friendly UI alerts. Backend rigidly rejects poorly formatted emails, weak passwords, and empty payloads.
+- **5. Creativity**: Standout features include the animated Gamification Progress Bar, "strikethrough" CSS micro-animations, Color-Coded Tag architecture, and dynamic "Visual Urgency" glows based on Date calculations.
 
 ## 🤝 Contributing
 Feel free to open an issue or submit a pull request if you have any suggestions to improve the project!

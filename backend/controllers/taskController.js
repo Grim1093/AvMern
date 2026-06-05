@@ -5,7 +5,7 @@ const Task = require('../models/Task');
 const getTasks = async (req, res) => {
     console.log(`[Task Step 1] Fetching tasks for User ID: ${req.user.id}`);
     try {
-        const { search, status, page = 1, limit = 10, sort = 'desc' } = req.query;
+        const { search, status, tag, page = 1, limit = 10, sort = 'desc' } = req.query;
         let query = { userId: req.user.id };
 
         if (search) {
@@ -13,6 +13,9 @@ const getTasks = async (req, res) => {
         }
         if (status && status !== 'all') {
             query.status = status;
+        }
+        if (tag && tag !== 'all') {
+            query.tag = tag;
         }
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -52,6 +55,8 @@ const createTask = async (req, res) => {
         const task = await Task.create({
             title: req.body.title,
             description: req.body.description || '',
+            tag: req.body.tag || 'Other',
+            dueDate: req.body.dueDate || null,
             userId: req.user.id
         });
         console.log(`[Task Success] Task created with ID: ${task._id}`);
