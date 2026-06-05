@@ -140,5 +140,14 @@ By default, the Vite server will run on `http://localhost:5173`. Open this URL i
 - **4. Error Handling & Validation**: API errors are caught and surfaced via friendly UI alerts. Backend rigidly rejects poorly formatted emails, weak passwords, and empty payloads.
 - **5. Creativity**: Standout features include the pulsing Honeycomb background, animated Gamification Progress Bar, Color-Coded Tag architecture, and dynamic "Visual Urgency" neon glows.
 
+## Live Demo
+
+Frontend:
+https://av-mern.vercel.app
+
+Backend:
+https://avmern.onrender.com
+
+
 ## 🤝 Contributing
 Feel free to open an issue or submit a pull request if you have any suggestions to improve the project!
