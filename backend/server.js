@@ -22,10 +22,7 @@ connectDB();
 console.log('[Server Step 5] Setting up middleware...');
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://av-mern.vercel.app/"
-    ],
+    origin: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
