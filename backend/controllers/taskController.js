@@ -5,9 +5,32 @@ const Task = require('../models/Task');
 const getTasks = async (req, res) => {
     console.log(`[Task Step 1] Fetching tasks for User ID: ${req.user.id}`);
     try {
-        const tasks = await Task.find({ userId: req.user.id });
-        console.log(`[Task Success] Found ${tasks.length} tasks.`);
-        res.status(200).json(tasks);
+        const { search, status, page = 1, limit = 10 } = req.query;
+        let query = { userId: req.user.id };
+
+        if (search) {
+            query.title = { $regex: search, $options: 'i' };
+        }
+        if (status && status !== 'all') {
+            query.status = status;
+        }
+
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        const tasks = await Task.find(query)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+            
+        const total = await Task.countDocuments(query);
+
+        console.log(`[Task Success] Found ${tasks.length} tasks (Total: ${total}).`);
+        res.status(200).json({
+            tasks,
+            totalPages: Math.ceil(total / parseInt(limit)),
+            currentPage: parseInt(page),
+            totalTasks: total
+        });
     } catch (error) {
         console.error('[Task Error] Failed to fetch tasks:', error.message);
         res.status(500).json({ message: 'Server Error' });

@@ -3,48 +3,61 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
 function Register() {
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-
-  const onChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    console.log('[Register Step 1] Form submitted. Validating input...');
-    
-    if (!formData.name || !formData.email || !formData.password) {
-        console.error('[Register Error] Missing fields.');
-        return alert('Please fill in all fields');
-    }
-
+    setError('');
     try {
-      console.log('[Register Step 2] Sending POST request to backend...');
-      const response = await axios.post('http://localhost:5000/api/users/register', formData);
-      
-      console.log('[Register Success] User registered! Saving token to localStorage...');
+      const response = await axios.post('http://localhost:5000/api/users/register', { name, email, password });
       localStorage.setItem('user', JSON.stringify(response.data));
-      
-      console.log('[Register Step 3] Redirecting to Dashboard...');
       navigate('/dashboard');
-    } catch (error) {
-      console.error('[Register Error] Failed to register:', error.response?.data?.message || error.message);
-      alert(error.response?.data?.message || 'Registration failed');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed');
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', textAlign: 'center' }}>
-      {console.log('[UI] Rendering Register Component')}
-      <h2>Register</h2>
-      <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-        <input type="text" name="name" placeholder="Full Name" onChange={onChange} />
-        <input type="email" name="email" placeholder="Email Address" onChange={onChange} />
-        <input type="password" name="password" placeholder="Password" onChange={onChange} />
-        <button type="submit">Sign Up</button>
-      </form>
-      <p>Already have an account? <Link to="/login">Login here</Link></p>
+    <div className="auth-container">
+      <div className="auth-card glass-panel">
+        <h2 className="title-gradient">Create Account</h2>
+        <p style={{ color: 'var(--text-secondary)' }}>Sign up to start managing your tasks.</p>
+        
+        {error && <div style={{ color: 'var(--danger)', marginTop: '1rem', padding: '0.5rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px' }}>{error}</div>}
+        
+        <form onSubmit={onSubmit}>
+          <input 
+            type="text" 
+            placeholder="Full Name" 
+            value={name} 
+            onChange={(e) => setName(e.target.value)} 
+            required 
+          />
+          <input 
+            type="email" 
+            placeholder="Email Address" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            required 
+          />
+          <input 
+            type="password" 
+            placeholder="Password" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            required 
+          />
+          <button type="submit" className="btn-primary">Sign Up</button>
+        </form>
+        
+        <p style={{ marginTop: '2rem', color: 'var(--text-secondary)' }}>
+          Already have an account? <Link to="/login" className="auth-link">Log in here</Link>
+        </p>
+      </div>
     </div>
   );
 }
