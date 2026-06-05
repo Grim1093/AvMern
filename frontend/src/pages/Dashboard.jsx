@@ -348,7 +348,7 @@ function Dashboard({ toggleTheme, theme }) {
               </div>
             ) : (
               tasks.map((task) => (
-                <div key={task._id} className={`task-card glass-panel task-card-enter ${getUrgencyClass(task)}`} role="listitem">
+                <div key={task._id} className={`task-card glass-panel task-card-enter card-tag-${(task.tag || 'other').toLowerCase()} ${getUrgencyClass(task)}`} role="listitem">
                   <div className={`task-content ${task.status === 'completed' ? 'completed' : ''}`}>
                     <div className="task-title">
                       <span className="task-title-text">{task.title}</span>

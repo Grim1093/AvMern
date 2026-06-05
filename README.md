@@ -1,12 +1,12 @@
 # Task Master - Premium MERN Stack Application
 
 A full-stack Task Management Web Application built with the **MERN** stack (MongoDB, Express.js, React.js, Node.js). 
-This project features a sleek, premium UI built from scratch using Vanilla CSS with glassmorphism, responsive grids, gamified elements, and dynamic micro-animations.
+This project features a sleek, premium UI built from scratch using Vanilla CSS with a **Sharp Sci-Fi Tactical HUD**, responsive grids, gamified elements, and dynamic micro-animations.
 
 ## 🌟 Features
 
 ### Frontend (React + Vite)
-- **Premium UI/UX (Glassmorphism)**: Designed entirely from scratch using Vanilla CSS to feature custom Light/Dark mode themes, frosted glass elements, and smooth interactions. No generic component libraries used.
+- **Sharp Sci-Fi Tactical HUD**: Designed entirely from scratch using Vanilla CSS to feature custom Light/Dark mode themes, chamfered geometric panels, and tactical UI components. No generic component libraries used.
 - **Gamification & Progress Tracking**: Features an animated, diagonal-striped "Daily Progress Bar" that calculates your completion ratio and fills up dynamically as you complete tasks.
 - **Satisfying Micro-Animations**: Interactive elements come to life with scale-down "push" button effects, a strikethrough animation when completing tasks, and a bounce-in animation when tasks are added.
 - **Color-Coded Task Tags**: Organize tasks with custom tags (`Work`, `Personal`, `Urgent`, `Other`). Tags are rendered as beautifully colored, pill-shaped badges.
@@ -83,12 +83,31 @@ By default, the Vite server will run on `http://localhost:5173`. Open this URL i
 
 ---
 
+## 📸 Demo
+
+### Landing / Hero
+![Hero Screenshot](frontend/src/assets/hero.png)
+
+### Secure Authentication
+![Login Screen](frontend/src/assets/login.png)
+
+### Tactical Dashboard (Dark Mode)
+![Dark Mode Dashboard](frontend/src/assets/home.png)
+
+### Tactical Dashboard (Light Mode)
+![Light Mode Dashboard](frontend/src/assets/homelight.png)
+
+### Mission Briefing (Edit Modal)
+![Edit Task Modal](frontend/src/assets/edit.png)
+
+---
+
 ## 🧪 Evaluation Criteria Met
 - **1. Code Quality**: Structured strictly into modular React components on the frontend, and distinct routers/controllers/models on the backend.
-- **2. UI/UX**: Implements a custom, premium gamified aesthetic avoiding all generic template look-and-feels. Includes thoughtful empty-states, responsive layout grids, and accessible invisible-scrollbars.
+- **2. UI/UX**: Implements a custom, premium Sci-Fi HUD aesthetic avoiding all generic template look-and-feels. Includes thoughtful empty-states, sharp geometry, and a responsive tactical grid.
 - **3. Functionality**: Full robust CRUD functionality alongside complex cross-filtering (search + status + tags + pagination).
 - **4. Error Handling & Validation**: API errors are caught and surfaced via friendly UI alerts. Backend rigidly rejects poorly formatted emails, weak passwords, and empty payloads.
-- **5. Creativity**: Standout features include the animated Gamification Progress Bar, "strikethrough" CSS micro-animations, Color-Coded Tag architecture, and dynamic "Visual Urgency" glows based on Date calculations.
+- **5. Creativity**: Standout features include the pulsing Honeycomb background, animated Gamification Progress Bar, Color-Coded Tag architecture, and dynamic "Visual Urgency" neon glows.
 
 ## 🤝 Contributing
 Feel free to open an issue or submit a pull request if you have any suggestions to improve the project!

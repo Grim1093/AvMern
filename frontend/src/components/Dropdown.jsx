@@ -1,18 +1,47 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 export default function Dropdown({ value, onChange, options, ariaLabel }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [coords, setCoords] = useState({ left: 0, top: 0, width: 0 });
   const dropdownRef = useRef(null);
+  const menuRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
+      if (
+        (dropdownRef.current && dropdownRef.current.contains(event.target)) ||
+        (menuRef.current && menuRef.current.contains(event.target))
+      ) {
+        return;
       }
+      setIsOpen(false);
     };
+
+    const handleScroll = () => setIsOpen(false);
+    const handleResize = () => setIsOpen(false);
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    window.addEventListener('scroll', handleScroll, true);
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
+
+  useLayoutEffect(() => {
+    if (isOpen && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      setCoords({
+        left: rect.left,
+        top: rect.bottom + window.scrollY,
+        width: rect.width
+      });
+    }
+  }, [isOpen]);
 
   const selectedOption = options.find(opt => opt.value === value) || options[0];
 
@@ -34,8 +63,18 @@ export default function Dropdown({ value, onChange, options, ariaLabel }) {
         </svg>
       </button>
       
-      {isOpen && (
-        <ul className="dropdown-menu" role="listbox">
+      {isOpen && createPortal(
+        <ul 
+          className="dropdown-menu" 
+          role="listbox"
+          ref={menuRef}
+          style={{
+            position: 'absolute',
+            top: `${coords.top + 8}px`,
+            left: `${coords.left}px`,
+            width: `${coords.width}px`
+          }}
+        >
           {options.map((option) => (
             <li 
               key={option.value}
@@ -50,7 +89,8 @@ export default function Dropdown({ value, onChange, options, ariaLabel }) {
               {option.label}
             </li>
           ))}
-        </ul>
+        </ul>,
+        document.body
       )}
     </div>
   );
