@@ -15,6 +15,7 @@ This project features a sleek, premium UI built from scratch using Vanilla CSS w
 - **Robust Searching & Filtering**: Cross-reference tasks by searching titles, filtering by completion status, AND filtering by specific tags simultaneously.
 - **Pagination**: Efficiently paginates large lists of tasks to ensure performance.
 - **Beautiful Empty States**: Utilizes custom SVG illustrations when the inbox is cleared to maintain a polished, professional feel.
+- **Flawless Mobile Experience**: The layout intelligently reconstructs itself on mobile viewports. A Floating Action Button (FAB), a sleek Hamburger Menu for filters, and a dedicated top-bar ensure maximal screen real estate for your tasks.
 
 ### Backend (Node.js + Express.js)
 - **RESTful API Architecture**: Organized cleanly with explicit Routes, Controllers, and Middleware.
@@ -83,19 +84,40 @@ By default, the Vite server will run on `http://localhost:5173`. Open this URL i
 
 ---
 
+## 🌍 Deployment
+
+### Deploying the Backend (Render)
+1. Push the repository to GitHub.
+2. Sign in to Render and create a new **Web Service**.
+3. Connect your GitHub repository and set the root directory to `backend`.
+4. Add the Environment Variables (`MONGO_URI`, `JWT_SECRET`).
+5. Render will automatically build and start the server using `npm start`!
+
+### Deploying the Frontend (Vercel)
+1. Sign in to Vercel and create a new Project from your GitHub repository.
+2. Set the Root Directory to `frontend`.
+3. In the Environment Variables section, add `VITE_API_URL` pointing to your deployed Render URL (e.g., `https://your-api.onrender.com`).
+4. Click Deploy! Vercel handles the Vite build automatically.
+
+---
+
 ## 📸 Demo
 
 ### Secure Authentication
 ![Login Screen](frontend/src/assets/login.png)
+![Login Mobile](frontend/src/assets/loginMobile.png)
 
 ### Tactical Dashboard (Dark Mode)
 ![Dark Mode Dashboard](frontend/src/assets/home.png)
+![Dark Mode Mobile](frontend/src/assets/homeMobile.png)
 
 ### Tactical Dashboard (Light Mode)
 ![Light Mode Dashboard](frontend/src/assets/homelight.png)
+![Light Mode Mobile](frontend/src/assets/homeLightMobile.png)
 
 ### Mission Briefing (Edit Modal)
 ![Edit Task Modal](frontend/src/assets/edit.png)
+![Edit Task Mobile](frontend/src/assets/editMobile.png)
 
 ---
 
