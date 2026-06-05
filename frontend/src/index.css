@@ -241,10 +241,27 @@ button:disabled {
 
 .auth-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 480px;
   padding: 2.5rem;
   text-align: center;
   position: relative;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.input-wrapper input {
+  padding-left: 2.75rem;
 }
 
 .theme-toggle-corner {
@@ -760,6 +777,6 @@ button:active {
 }
 
 @keyframes pulseHex {
-  0% { opacity: 0.04; transform: scale(1); }
-  100% { opacity: 0.12; transform: scale(1.05); }
+  0% { opacity: 0.02; transform: scale(1); }
+  100% { opacity: 0.08; transform: scale(1.05); }
 }

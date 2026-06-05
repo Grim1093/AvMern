@@ -23,6 +23,7 @@ function Dashboard({ toggleTheme, theme }) {
 
   // Edit State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [editTaskId, setEditTaskId] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
@@ -43,6 +44,17 @@ function Dashboard({ toggleTheme, theme }) {
   useEffect(() => {
     localStorage.setItem('sortPref', sortPref);
   }, [sortPref]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsEditModalOpen(false);
+        setIsFeedbackModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -140,6 +152,7 @@ function Dashboard({ toggleTheme, theme }) {
   const onUpdateTask = async (e) => {
     e.preventDefault();
     if (!editTitle.trim()) return;
+    setIsSaving(true);
     try {
       await axios.put(`http://localhost:5000/api/tasks/${editTaskId}`, 
         { 
@@ -155,6 +168,8 @@ function Dashboard({ toggleTheme, theme }) {
       announce('Task updated successfully');
     } catch (error) {
       console.error('Failed to update task:', error.message);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -468,7 +483,9 @@ function Dashboard({ toggleTheme, theme }) {
               </div>
               <div className="modal-actions">
                 <button type="button" className="btn-outline" onClick={() => setIsEditModalOpen(false)}>Cancel</button>
-                <button type="submit" className="btn-primary">Save Changes</button>
+                <button type="submit" className="btn-primary" disabled={isSaving}>
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </button>
               </div>
             </form>
           </div>
