@@ -20,7 +20,16 @@ connectDB();
 
 // Middleware
 console.log('[Server Step 5] Setting up middleware...');
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://av-mern.vercel.app/"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+  })
+);
 app.use(express.json());
 console.log('[Server Step 6] Middleware configured (CORS and JSON parser).');
 
@@ -29,6 +38,13 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
 
 const PORT = process.env.PORT || 5000;
+
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Task Master API is running"
+  });
+});
 
 app.listen(PORT, () => {
     console.log(`[Server Success] Server is actively listening on port ${PORT}`);
