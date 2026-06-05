@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
 function Register({ toggleTheme, theme }) {
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,7 +14,7 @@ function Register({ toggleTheme, theme }) {
     e.preventDefault();
     setError('');
     try {
-      const response = await axios.post('http://localhost:5000/api/users/register', { name, email, password });
+      const response = await axios.post(`${API_URL}/api/users/register`, { name, email, password });
       localStorage.setItem('user', JSON.stringify(response.data));
       navigate('/dashboard');
     } catch (err) {

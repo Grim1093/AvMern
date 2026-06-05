@@ -4,6 +4,8 @@ import axios from 'axios';
 import Dropdown from '../components/Dropdown';
 
 function Dashboard({ toggleTheme, theme }) {
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -71,7 +73,7 @@ function Dashboard({ toggleTheme, theme }) {
   const fetchTasks = useCallback(async () => {
     if (!user) return;
     try {
-      const response = await axios.get(`http://localhost:5000/api/tasks`, {
+      const response = await axios.get(`${API_URL}/api/tasks`, {
         params: { search, status: statusFilter, tag: tagFilter, sort: sortPref, page, limit: 5 },
         headers: { Authorization: `Bearer ${user.token}` },
       });
@@ -94,7 +96,7 @@ function Dashboard({ toggleTheme, theme }) {
     e.preventDefault();
     if (!title.trim()) return;
     try {
-      await axios.post('http://localhost:5000/api/tasks', { 
+      await axios.post(`${API_URL}/api/tasks`, { 
         title, 
         description,
         tag,
@@ -116,7 +118,7 @@ function Dashboard({ toggleTheme, theme }) {
 
   const onDeleteTask = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/tasks/${id}`, {
+      await axios.delete(`${API_URL}/api/tasks/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       fetchTasks();
@@ -129,7 +131,7 @@ function Dashboard({ toggleTheme, theme }) {
   const onToggleStatus = async (task) => {
     try {
       const newStatus = task.status === 'completed' ? 'pending' : 'completed';
-      await axios.put(`http://localhost:5000/api/tasks/${task._id}`, 
+      await axios.put(`${API_URL}/api/tasks/${task._id}`, 
         { status: newStatus }, 
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
@@ -154,7 +156,7 @@ function Dashboard({ toggleTheme, theme }) {
     if (!editTitle.trim()) return;
     setIsSaving(true);
     try {
-      await axios.put(`http://localhost:5000/api/tasks/${editTaskId}`, 
+      await axios.put(`${API_URL}/api/tasks/${editTaskId}`, 
         { 
           title: editTitle, 
           description: editDescription,
