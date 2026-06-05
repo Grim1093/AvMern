@@ -5,7 +5,7 @@ const Task = require('../models/Task');
 const getTasks = async (req, res) => {
     console.log(`[Task Step 1] Fetching tasks for User ID: ${req.user.id}`);
     try {
-        const { search, status, page = 1, limit = 10 } = req.query;
+        const { search, status, page = 1, limit = 10, sort = 'desc' } = req.query;
         let query = { userId: req.user.id };
 
         if (search) {
@@ -16,9 +16,10 @@ const getTasks = async (req, res) => {
         }
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
+        const sortOption = sort === 'asc' ? { createdAt: 1 } : { createdAt: -1 };
 
         const tasks = await Task.find(query)
-            .sort({ createdAt: -1 })
+            .sort(sortOption)
             .skip(skip)
             .limit(parseInt(limit));
             

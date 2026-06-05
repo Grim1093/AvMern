@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
-function Register() {
+function Register({ toggleTheme, theme }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,6 +24,11 @@ function Register() {
   return (
     <div className="auth-container">
       <div className="auth-card glass-panel">
+        <div className="theme-toggle-corner">
+          <button className="btn-icon" onClick={toggleTheme} title="Toggle Theme">
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
+        </div>
         <h2 className="title-gradient">Create Account</h2>
         <p style={{ color: 'var(--text-secondary)' }}>Sign up to start managing your tasks.</p>
         
