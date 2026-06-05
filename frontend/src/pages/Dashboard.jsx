@@ -36,6 +36,10 @@ function Dashboard({ toggleTheme, theme }) {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
 
+  // Mobile UI State
+  const [isMobileCreateModalOpen, setIsMobileCreateModalOpen] = useState(false);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
 
@@ -52,6 +56,7 @@ function Dashboard({ toggleTheme, theme }) {
       if (e.key === 'Escape') {
         setIsEditModalOpen(false);
         setIsFeedbackModalOpen(false);
+        setIsMobileCreateModalOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -206,6 +211,89 @@ function Dashboard({ toggleTheme, theme }) {
 
   if (!user) return null;
 
+  // --- EXTRACTED UI COMPONENTS FOR MULTIPLE LAYOUTS ---
+  const ThemeToggleBtn = (
+    <button className="btn-icon" onClick={toggleTheme} title="Toggle Theme" aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+      {theme === 'light' ? (
+        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
+      ) : (
+        <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+      )}
+    </button>
+  );
+
+  const BurgerToggleBtn = (
+    <button className="btn-icon mobile-filter-toggle" onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)} aria-label="Toggle Filters">
+      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"></path></svg>
+    </button>
+  );
+
+  const ProgressBarComponent = (
+    <div style={{ width: '100%' }}>
+      <div className="progress-container" aria-label={`Progress: ${Math.round(progressRatio)}%`}>
+        <div className="progress-fill" style={{ width: `${progressRatio}%` }}></div>
+      </div>
+      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.25rem', textAlign: 'right' }}>
+        {completedCount} of {tasks.length} completed
+      </p>
+    </div>
+  );
+
+  const FeedbackBtnComponent = (
+    <button className="btn-outline" onClick={() => setIsFeedbackModalOpen(true)} style={{ fontSize: '0.85rem', width: '100%' }}>
+      Give Feedback
+    </button>
+  );
+
+  const ControlsBarComponent = (
+    <div className={`controls-bar glass-panel ${!isMobileFiltersOpen ? 'mobile-hidden' : ''}`} style={{ padding: '1rem', marginBottom: '1rem', borderRadius: '12px' }}>
+      <input type="search" className="search-input" placeholder="Search your tasks..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} aria-label="Search tasks" />
+      <Dropdown value={statusFilter} onChange={(val) => { setStatusFilter(val); setPage(1); }} options={[{ value: 'all', label: 'All Status' }, { value: 'pending', label: 'Pending' }, { value: 'completed', label: 'Completed' }]} ariaLabel="Filter by status" />
+      <Dropdown value={tagFilter} onChange={(val) => { setTagFilter(val); setPage(1); }} options={[{ value: 'all', label: 'All Tags' }, { value: 'Work', label: 'Work' }, { value: 'Personal', label: 'Personal' }, { value: 'Urgent', label: 'Urgent' }, { value: 'Other', label: 'Other' }]} ariaLabel="Filter by tag" />
+      <Dropdown value={sortPref} onChange={(val) => { setSortPref(val); setPage(1); }} options={[{ value: 'desc', label: 'Newest First' }, { value: 'asc', label: 'Oldest First' }]} ariaLabel="Sort tasks" />
+    </div>
+  );
+
+  const TaskListComponent = (
+    <div className="task-list-container" role="list">
+      {tasks.length === 0 ? (
+        <div className="empty-state" style={{ margin: 'auto', animation: 'fadeIn 0.5s ease-out' }}>
+          <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.8, marginBottom: '1rem' }}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <h3 style={{ margin: 0, marginBottom: '0.5rem' }}>You're all caught up!</h3><p>Time to relax, or create a new task.</p>
+        </div>
+      ) : (
+        tasks.map((task) => (
+          <div key={task._id} className={`task-card glass-panel task-card-enter card-tag-${(task.tag || 'other').toLowerCase()} ${getUrgencyClass(task)}`} role="listitem">
+            <div className={`task-content ${task.status === 'completed' ? 'completed' : ''}`}>
+              <div className="task-title">
+                <span className="task-title-text">{task.title}</span><span className={`task-tag tag-${(task.tag || 'other').toLowerCase()}`}>{task.tag || 'Other'}</span>
+                {task.dueDate && (
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>{new Date(task.dueDate).toLocaleDateString()}</span>
+                )}
+              </div>
+              {task.description && <div className="task-desc">{task.description}</div>}
+            </div>
+            <div className="task-actions">
+              <button className={`btn-icon ${task.status === 'completed' ? 'btn-outline' : 'btn-success'}`} onClick={() => onToggleStatus(task)} aria-label={task.status === 'completed' ? 'Mark as pending' : 'Mark as completed'} title={task.status === 'completed' ? 'Mark as pending' : 'Mark as completed'}>
+                {task.status === 'completed' ? (<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 12h18M12 3l-9 9 9 9"></path></svg>) : (<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>)}
+              </button>
+              <button className="btn-icon btn-outline" onClick={() => openEditModal(task)} aria-label="Edit task" title="Edit Task"><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg></button>
+              <button className="btn-icon btn-danger" onClick={() => onDeleteTask(task._id)} aria-label="Delete task" title="Delete Task"><svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+
+  const PaginationComponent = totalPages > 1 && (
+    <div className="pagination glass-panel" style={{ marginTop: '1rem', padding: '1rem', borderRadius: '12px' }} aria-label="Pagination Navigation">
+      <button className="btn-outline" disabled={page === 1} onClick={() => setPage(page - 1)} aria-label="Previous Page">Previous</button>
+      <span className="page-info" aria-live="polite">Page {page} of {totalPages}</span>
+      <button className="btn-outline" disabled={page === totalPages} onClick={() => setPage(page + 1)} aria-label="Next Page">Next</button>
+    </div>
+  );
+
   return (
     <div className="dashboard-container">
       {/* Hidden ARIA Live Region for Screen Readers */}
@@ -213,46 +301,102 @@ function Dashboard({ toggleTheme, theme }) {
         {announcement}
       </div>
 
-      <div className="dashboard-layout">
+      {/* --- DESKTOP LAYOUT --- */}
+      <div className="dashboard-layout hide-on-mobile">
         
         {/* SIDEBAR */}
         <div className="dashboard-sidebar">
-          
           <div className="dashboard-header glass-panel" style={{ padding: '1.5rem' }}>
             <div>
               <h2 className="title-gradient" style={{ fontSize: '1.5rem' }}>{getGreeting()},<br/>{user.name.split(' ')[0]}</h2>
               <p style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Manage your day effortlessly</p>
-              
-              {/* Gamification Progress Bar */}
-              <div className="progress-container" aria-label={`Progress: ${Math.round(progressRatio)}%`}>
-                <div className="progress-fill" style={{ width: `${progressRatio}%` }}></div>
-              </div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.25rem', textAlign: 'right' }}>
-                {completedCount} of {tasks.length} completed
-              </p>
+              {ProgressBarComponent}
             </div>
             
             <div className="user-info" style={{ marginTop: '0.5rem' }}>
-              <button 
-                className="btn-icon" 
-                onClick={toggleTheme} 
-                title="Toggle Theme"
-                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-              >
-                {theme === 'light' ? (
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path></svg>
-                ) : (
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
-                )}
-              </button>
+              {ThemeToggleBtn}
               <div className="user-avatar" aria-hidden="true">{user.name.charAt(0).toUpperCase()}</div>
               <button className="btn-outline" onClick={onLogout} aria-label="Log out of application" style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem' }}>Logout</button>
             </div>
           </div>
 
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
+          <div className="glass-panel desktop-create-task" style={{ padding: '1.5rem' }}>
             <form onSubmit={onAddTask} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <h3 style={{ margin: 0, fontSize: '1.25rem' }}>Create a Task</h3>
+              <input type="text" placeholder="What needs to be done?" value={title} onChange={(e) => setTitle(e.target.value)} required aria-label="New Task Title" />
+              <textarea placeholder="Additional notes (optional)" value={description} onChange={(e) => setDescription(e.target.value)} aria-label="New Task Description" rows="2" style={{ resize: 'vertical' }} />
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <Dropdown value={tag} onChange={(val) => setTag(val)} options={[{ value: 'Work', label: 'Work' }, { value: 'Personal', label: 'Personal' }, { value: 'Urgent', label: 'Urgent' }, { value: 'Other', label: 'Other' }]} ariaLabel="Select Tag" />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} aria-label="Due Date" style={{ width: '100%', padding: '0.75rem 0.5rem', boxSizing: 'border-box' }} />
+                </div>
+              </div>
+              <button type="submit" className="btn-primary">
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{ marginRight: '0.5rem' }}><path d="M12 5v14M5 12h14"></path></svg>
+                Add Task
+              </button>
+            </form>
+          </div>
+
+          <div className="sidebar-bottom-action" style={{ marginTop: 'auto', paddingTop: '1rem' }}>
+            {FeedbackBtnComponent}
+          </div>
+        </div>
+
+        {/* MAIN CONTENT */}
+        <div className="dashboard-main">
+          {ControlsBarComponent}
+          {TaskListComponent}
+          {PaginationComponent}
+        </div>
+      </div>
+
+      {/* --- MOBILE LAYOUT --- */}
+      <div className="mobile-only-layout show-on-mobile">
+        <div className="mobile-top-bar glass-panel" style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h2 className="title-gradient" style={{ margin: 0, fontSize: '1.25rem' }}>{getGreeting()}, {user.name.split(' ')[0]}</h2>
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            {ThemeToggleBtn}
+            {BurgerToggleBtn}
+          </div>
+        </div>
+        
+        <div className="mobile-progress-wrapper glass-panel" style={{ padding: '1rem', marginBottom: '1rem' }}>
+           {ProgressBarComponent}
+        </div>
+        
+        {ControlsBarComponent}
+        
+        <div className="dashboard-main" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', overflow: 'visible', flexGrow: 1, minHeight: 0 }}>
+          {TaskListComponent}
+          {PaginationComponent}
+        </div>
+        
+        <div className="mobile-feedback-wrapper" style={{ marginTop: '1rem' }}>
+           {FeedbackBtnComponent}
+           <button className="btn-outline" onClick={onLogout} style={{ marginTop: '0.5rem', width: '100%', fontSize: '0.85rem' }}>Logout</button>
+        </div>
+      </div>
+
+      {/* Mobile Floating Action Button */}
+      <button 
+        className="mobile-fab btn-primary" 
+        onClick={() => setIsMobileCreateModalOpen(true)}
+        aria-label="Create a new task"
+      >
+        <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+      </button>
+
+      {/* Mobile Create Task Modal */}
+      {isMobileCreateModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsMobileCreateModalOpen(false)}>
+          <div className="modal-content glass-panel" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="create-dialog-title">
+            <h2 id="create-dialog-title" className="title-gradient">Create a Task</h2>
+            <form onSubmit={(e) => { onAddTask(e); setIsMobileCreateModalOpen(false); }}>
               <input 
                 type="text" 
                 placeholder="What needs to be done?" 
@@ -260,6 +404,7 @@ function Dashboard({ toggleTheme, theme }) {
                 onChange={(e) => setTitle(e.target.value)} 
                 required
                 aria-label="New Task Title"
+                style={{ marginBottom: '1rem' }}
               />
               <textarea 
                 placeholder="Additional notes (optional)" 
@@ -267,9 +412,9 @@ function Dashboard({ toggleTheme, theme }) {
                 onChange={(e) => setDescription(e.target.value)} 
                 aria-label="New Task Description"
                 rows="2"
-                style={{ resize: 'vertical' }}
+                style={{ resize: 'vertical', marginBottom: '1rem' }}
               />
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <Dropdown 
                     value={tag}
@@ -293,150 +438,14 @@ function Dashboard({ toggleTheme, theme }) {
                   />
                 </div>
               </div>
-              <button type="submit" className="btn-primary">
-                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
-                Add Task
-              </button>
+              <div className="modal-actions">
+                <button type="button" className="btn-outline" onClick={() => setIsMobileCreateModalOpen(false)}>Cancel</button>
+                <button type="submit" className="btn-primary">Add Task</button>
+              </div>
             </form>
           </div>
-
-          <div style={{ marginTop: 'auto', paddingTop: '1rem' }}>
-            <button className="btn-outline" onClick={() => setIsFeedbackModalOpen(true)} style={{ fontSize: '0.85rem', width: '100%' }}>
-              Give Feedback
-            </button>
-          </div>
-
         </div>
-
-        {/* MAIN CONTENT */}
-        <div className="dashboard-main">
-          
-          <div className="controls-bar glass-panel" style={{ padding: '1rem', marginBottom: '1rem', borderRadius: '12px' }}>
-            <input 
-              type="search" 
-              className="search-input"
-              placeholder="Search your tasks..." 
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              aria-label="Search tasks"
-            />
-            <Dropdown 
-              value={statusFilter}
-              onChange={(val) => { setStatusFilter(val); setPage(1); }}
-              options={[
-                { value: 'all', label: 'All Status' },
-                { value: 'pending', label: 'Pending' },
-                { value: 'completed', label: 'Completed' }
-              ]}
-              ariaLabel="Filter by status"
-            />
-            <Dropdown 
-              value={tagFilter}
-              onChange={(val) => { setTagFilter(val); setPage(1); }}
-              options={[
-                { value: 'all', label: 'All Tags' },
-                { value: 'Work', label: 'Work' },
-                { value: 'Personal', label: 'Personal' },
-                { value: 'Urgent', label: 'Urgent' },
-                { value: 'Other', label: 'Other' }
-              ]}
-              ariaLabel="Filter by tag"
-            />
-            <Dropdown 
-              value={sortPref}
-              onChange={(val) => { setSortPref(val); setPage(1); }}
-              options={[
-                { value: 'desc', label: 'Newest First' },
-                { value: 'asc', label: 'Oldest First' }
-              ]}
-              ariaLabel="Sort tasks"
-            />
-          </div>
-
-          <div className="task-list-container" role="list">
-            {tasks.length === 0 ? (
-              <div className="empty-state" style={{ margin: 'auto', animation: 'fadeIn 0.5s ease-out' }}>
-                <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.8, marginBottom: '1rem' }}>
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-                <h3 style={{ margin: 0, marginBottom: '0.5rem' }}>You're all caught up!</h3>
-                <p>Time to relax, or create a new task.</p>
-              </div>
-            ) : (
-              tasks.map((task) => (
-                <div key={task._id} className={`task-card glass-panel task-card-enter card-tag-${(task.tag || 'other').toLowerCase()} ${getUrgencyClass(task)}`} role="listitem">
-                  <div className={`task-content ${task.status === 'completed' ? 'completed' : ''}`}>
-                    <div className="task-title">
-                      <span className="task-title-text">{task.title}</span>
-                      <span className={`task-tag tag-${(task.tag || 'other').toLowerCase()}`}>{task.tag || 'Other'}</span>
-                      {task.dueDate && (
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                          <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
-                          {new Date(task.dueDate).toLocaleDateString()}
-                        </span>
-                      )}
-                    </div>
-                    {task.description && <div className="task-desc">{task.description}</div>}
-                  </div>
-                  <div className="task-actions">
-                    <button 
-                      className={`btn-icon ${task.status === 'completed' ? 'btn-outline' : 'btn-success'}`}
-                      onClick={() => onToggleStatus(task)}
-                      aria-label={task.status === 'completed' ? 'Mark as pending' : 'Mark as completed'}
-                      title={task.status === 'completed' ? 'Mark as pending' : 'Mark as completed'}
-                    >
-                      {task.status === 'completed' ? (
-                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 12h18M12 3l-9 9 9 9"></path></svg>
-                      ) : (
-                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                      )}
-                    </button>
-                    <button 
-                      className="btn-icon btn-outline" 
-                      onClick={() => openEditModal(task)} 
-                      aria-label="Edit task"
-                      title="Edit Task"
-                    >
-                      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg>
-                    </button>
-                    <button 
-                      className="btn-icon btn-danger" 
-                      onClick={() => onDeleteTask(task._id)} 
-                      aria-label="Delete task"
-                      title="Delete Task"
-                    >
-                      <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          {totalPages > 1 && (
-            <div className="pagination glass-panel" style={{ marginTop: '1rem', padding: '1rem', borderRadius: '12px' }} aria-label="Pagination Navigation">
-              <button 
-                className="btn-outline"
-                disabled={page === 1} 
-                onClick={() => setPage(page - 1)}
-                aria-label="Previous Page"
-              >
-                Previous
-              </button>
-              <span className="page-info" aria-live="polite">Page {page} of {totalPages}</span>
-              <button 
-                className="btn-outline"
-                disabled={page === totalPages} 
-                onClick={() => setPage(page + 1)}
-                aria-label="Next Page"
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+      )}
 
       {/* Edit Modal */}
       {isEditModalOpen && (

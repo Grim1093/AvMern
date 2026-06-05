@@ -24,13 +24,13 @@ function Register({ toggleTheme, theme }) {
 
   return (
     <div className="auth-container">
-      <div className="auth-card glass-panel">
-        <div className="theme-toggle-corner">
-          <button className="btn-icon" onClick={toggleTheme} title="Toggle Theme">
+      <div className="auth-card glass-panel" style={{ textAlign: 'left' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+          <h2 className="title-gradient" style={{ margin: 0 }}>Create Account</h2>
+          <button className="btn-icon" onClick={toggleTheme} title="Toggle Theme" style={{ flexShrink: 0 }}>
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
         </div>
-        <h2 className="title-gradient">Create Account</h2>
         <p style={{ color: 'var(--text-secondary)' }}>Sign up to start managing your tasks.</p>
         
         {error && <div style={{ color: 'var(--danger)', marginTop: '1rem', padding: '0.5rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px' }}>{error}</div>}
