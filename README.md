@@ -85,9 +85,6 @@ By default, the Vite server will run on `http://localhost:5173`. Open this URL i
 
 ## 📸 Demo
 
-### Landing / Hero
-![Hero Screenshot](frontend/src/assets/hero.png)
-
 ### Secure Authentication
 ![Login Screen](frontend/src/assets/login.png)
 

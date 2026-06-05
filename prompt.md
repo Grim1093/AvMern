@@ -1,87 +1,96 @@
 # Task Master - Project Overview
 
 ## Main Goal
-The main goal of the project is to build a full-stack Task Management Web Application (Task Master) using the MERN stack (MongoDB, Express.js, React.js, Node.js). It provides users with a seamless, premium UI with a glassmorphism aesthetic, enabling them to register, log in, and effectively manage their daily tasks with advanced state tracking, searching, filtering, and pagination capabilities.
+The main goal of the project is to build a full-stack Task Management Web Application (Task Master) using the MERN stack (MongoDB, Express.js, React.js, Node.js). It aims to provide users with a seamless, premium UI featuring a custom Sharp Sci-Fi Tactical HUD, Light/Dark mode themes, gamified elements, dynamic micro-animations, and glassmorphism styling built purely with Vanilla CSS.
 
 ## What is Done in the Project & Its Capabilities
 The project is a fully functional web application with the following capabilities:
-- **User Authentication**: Secure user registration and login using JSON Web Tokens (JWT) and bcrypt for password hashing.
+- **User Authentication**: Secure user registration and login using JSON Web Tokens (JWT) and bcryptjs for password hashing. Enforces strict backend validation.
 - **Task Management (CRUD)**: Users can create, read, update, and delete their own tasks.
-- **Task State Tracking**: Tasks can be toggled instantly between 'Pending' and 'Completed' states.
-- **Search & Filter**: Real-time searching of tasks by title and filtering by completion status.
-- **Pagination**: Breaking down lists of tasks to handle large datasets effectively.
-- **Premium UI/UX**: Designed using Vanilla CSS (no component libraries) with dark mode, frosted glass elements, and smooth interactions/animations.
-- **Protected API Routes**: Backend middleware ensures users can only access and modify their own tasks.
+- **Task State Tracking**: Instant toggling of tasks between 'Pending' and 'Completed' states.
+- **Gamification & Visual Urgency**: Features a dynamic daily progress bar and visually striking glows for tasks that are due soon (orange) or overdue (red). Includes custom colored pill-shaped badges for tags (Work, Personal, Urgent, Other).
+- **Search, Filter & Pagination**: Advanced cross-referencing capabilities to search by title, filter by completion status, filter by tags, and efficient pagination for large data sets.
+- **Premium UI/UX**: Designed using completely custom Vanilla CSS without template libraries. Includes striking CSS micro-animations, a responsive grid layout, SVG empty states, chamfered geometry, and a tactical design language.
+- **Protected API Routes**: Backend middleware ensuring robust security so that users can only access and modify their own tasks.
 
 ## Database Structure
 The application uses MongoDB via Mongoose, with two primary schemas:
 
 ### User Schema
 - `name`: String (Required)
-- `email`: String (Required, Unique)
-- `password`: String (Required, Hashed)
+- `email`: String (Required, Unique, Regex Validated)
+- `password`: String (Required, Minimum Length Validated)
 - *timestamps*: true (createdAt, updatedAt)
 
 ### Task Schema
 - `title`: String (Required)
 - `description`: String (Optional)
+- `tag`: String (Enum: ['Work', 'Personal', 'Urgent', 'Other'], Default: 'Other')
+- `dueDate`: Date (Optional)
 - `status`: String (Enum: ['pending', 'completed'], Default: 'pending')
 - `userId`: ObjectId (Reference to 'User', Required)
 - *timestamps*: true (createdAt, updatedAt)
 
 ## Folder Definitions
 - `backend/`: Contains the Node.js and Express.js backend API source code.
-  - `backend/config/`: Configuration files, such as database connection setup.
-  - `backend/controllers/`: Contains the core logic for handling API requests and business logic for tasks and users.
-  - `backend/middleware/`: Custom Express middleware, such as the authentication guard (`authMiddleware.js`).
-  - `backend/models/`: Mongoose schemas defining the data structure for MongoDB.
-  - `backend/routes/`: Express route definitions that map API endpoints to their respective controllers.
-- `frontend/`: Contains the React.js frontend application, bootstrapped with Vite.
-  - `frontend/public/`: Static assets like favicons that don't need processing by the bundler.
-  - `frontend/src/`: The main source code for the React frontend application.
-    - `frontend/src/assets/`: Media and image assets used within the application.
-    - `frontend/src/components/`: Reusable React components used across multiple pages (e.g., custom Dropdown component).
-    - `frontend/src/pages/`: React components representing entire views or pages (Login, Register, Dashboard).
+  - `backend/config/`: Configuration files containing the logic to connect to the MongoDB database.
+  - `backend/controllers/`: Contains the core handling and business logic for processing API requests for users and tasks.
+  - `backend/middleware/`: Custom Express middleware, specifically the authentication guard verifying JWTs.
+  - `backend/models/`: Mongoose schemas defining the data structure for the MongoDB collections.
+  - `backend/routes/`: Express route definitions mapping the endpoints to their respective controller functions.
+- `frontend/`: Contains the React.js application, bootstrapped with Vite.
+  - `frontend/public/`: Static public assets such as favicons and global SVG icons that are served directly.
+  - `frontend/src/`: The main source code directory for the React frontend application.
+    - `frontend/src/assets/`: Media files including screenshots, logos, and vector illustrations used in the app.
+    - `frontend/src/components/`: Reusable React components utilized across multiple views (e.g., custom Dropdowns).
+    - `frontend/src/pages/`: React components representing the main viewable pages (Dashboard, Login, Register).
 
 ## File Definitions
 
 ### Root Level Files
-- `.gitignore`: Specifies intentionally untracked files to ignore for Git version control.
-- `README.md`: The main project documentation explaining features, tech stack, and setup instructions.
-- `prompt.md`: Project documentation containing its main goal, structure, what is done, capabilities and prompt.
+- `.gitignore`: Specifies intentionally untracked files to ignore for Git version control in the root directory.
+- `README.md`: The main project documentation explaining features, the tech stack, setup instructions, and evaluation criteria.
+- `prompt.md`: Comprehensive project documentation containing the main goal, structure, capabilities, and the generative prompt instructions.
 
 ### Backend Files
-- `backend/.env`: Environment variables including `PORT`, `MONGO_URI`, and `JWT_SECRET`.
-- `backend/config/db.js`: Contains the `connectDB` function to establish a connection to the MongoDB cluster using Mongoose.
-- `backend/controllers/taskController.js`: Defines logic for task-related API requests, including fetching (with search/filter/pagination), creating, updating, and deleting tasks.
-- `backend/controllers/userController.js`: Defines logic for user authentication, password hashing, and JWT generation during registration and login.
-- `backend/middleware/authMiddleware.js`: Contains the `protect` middleware to verify incoming JWT tokens and attach the authenticated user to the request object.
-- `backend/models/Task.js`: Defines the Mongoose schema for a Task.
-- `backend/models/User.js`: Defines the Mongoose schema for a User.
-- `backend/package.json`: Manages backend dependencies, scripts, and metadata.
-- `backend/package-lock.json`: Locks dependency versions for deterministic backend installs.
-- `backend/routes/taskRoutes.js`: Maps task API endpoints (`/api/tasks`) to controller functions, applying the auth middleware for protection.
-- `backend/routes/userRoutes.js`: Maps user API endpoints (`/api/users/register`, `/api/users/login`) to controller functions.
-- `backend/server.js`: The entry point for the backend server, setting up Express, middleware, routes, and connecting to the database.
+- `backend/.env`: Defines environment variables including `PORT`, `MONGO_URI`, and `JWT_SECRET`.
+- `backend/config/db.js`: Contains the `connectDB` function to establish an active connection to the MongoDB cluster utilizing Mongoose.
+- `backend/controllers/taskController.js`: Defines logic for task-related operations, including retrieving (with search, filter, and pagination logic), creating, updating, and deleting task records.
+- `backend/controllers/userController.js`: Defines the logic for handling user registration, login authentication, password hashing, and token generation.
+- `backend/middleware/authMiddleware.js`: Implements the `protect` middleware function that verifies authorization headers and attaches the verified user to the request object.
+- `backend/models/Task.js`: Defines the Mongoose schema and model for a `Task` document.
+- `backend/models/User.js`: Defines the Mongoose schema and model for a `User` document.
+- `backend/package.json`: Manages the backend project dependencies, scripts, and general metadata.
+- `backend/package-lock.json`: Auto-generated lockfile for deterministic dependency resolution in the backend.
+- `backend/routes/taskRoutes.js`: Maps task endpoints (e.g., `/api/tasks`) to the respective `taskController` functions, while wrapping them in the `protect` middleware.
+- `backend/routes/userRoutes.js`: Maps user authentication endpoints (e.g., `/api/users/register`) to the respective `userController` functions.
+- `backend/server.js`: The central entry point for the backend server that boots Express, sets up CORS and JSON middleware, mounts API routes, and connects to the database.
 
 ### Frontend Files
-- `frontend/.gitignore`: Specifies untracked files for the frontend project.
-- `frontend/README.md`: Boilerplate README for the Vite React app.
-- `frontend/eslint.config.js`: ESLint configuration for linting frontend code.
-- `frontend/index.html`: The main HTML template where the React app is injected.
-- `frontend/package.json`: Manages frontend dependencies, scripts, and metadata.
-- `frontend/package-lock.json`: Locks dependency versions for deterministic frontend installs.
-- `frontend/public/favicon.svg` & `frontend/public/icons.svg`: Public static icon files.
-- `frontend/src/App.css`: Specific styles for the main App component and basic layout.
-- `frontend/src/App.jsx`: The root App component setting up React Router and defining navigation paths.
-- `frontend/src/assets/hero.png`, `react.svg`, `vite.svg`: Static visual assets for the frontend.
-- `frontend/src/components/Dropdown.jsx`: A custom React dropdown component for selecting filter options.
-- `frontend/src/index.css`: Global stylesheet defining CSS variables, glassmorphism utilities, layout styling, inputs, buttons, and animations.
-- `frontend/src/main.jsx`: The React entry point, wrapping `App` in `React.StrictMode` and rendering it to the DOM.
-- `frontend/src/pages/Dashboard.jsx`: The main authenticated view for displaying, adding, editing, deleting tasks, along with search, filter, and pagination UI.
-- `frontend/src/pages/Login.jsx`: Component for the user login form and authentication flow.
-- `frontend/src/pages/Register.jsx`: Component for new user registration form and flow.
-- `frontend/vite.config.js`: Configuration for the Vite development server and bundler.
+- `frontend/.gitignore`: Specifies intentionally untracked files for the Vite frontend project.
+- `frontend/README.md`: Contains boilerplate instructions for the default Vite React application setup.
+- `frontend/eslint.config.js`: Setup file for ESLint rules to maintain frontend code formatting and quality.
+- `frontend/index.html`: The root HTML template file where the React application mounts itself.
+- `frontend/package.json`: Manages the frontend project dependencies, configuration, and scripts.
+- `frontend/package-lock.json`: Auto-generated lockfile for deterministic dependency resolution in the frontend.
+- `frontend/public/favicon.svg`: Vector icon graphic used as the browser tab favicon.
+- `frontend/public/icons.svg`: Publicly accessible SVG collection or sprite sheet.
+- `frontend/src/App.css`: Specific stylistic definitions and basic layout wrappers for the root App component.
+- `frontend/src/App.jsx`: The root React functional component establishing the React Router dom, theme toggling logic, and defining navigation paths.
+- `frontend/src/assets/edit.png`: Preview image demonstrating the "Mission Briefing" edit task modal.
+- `frontend/src/assets/hero.png`: Primary illustration or hero asset graphics.
+- `frontend/src/assets/home.png`: Preview screenshot of the Tactical Dashboard in dark mode.
+- `frontend/src/assets/homelight.png`: Preview screenshot of the Tactical Dashboard in light mode.
+- `frontend/src/assets/login.png`: Preview screenshot of the secure authentication login screen.
+- `frontend/src/assets/react.svg`: Static asset rendering the React logo.
+- `frontend/src/assets/vite.svg`: Static asset rendering the Vite logo.
+- `frontend/src/components/Dropdown.jsx`: Custom coded, fully accessible React select/dropdown component built for tag and status filtering.
+- `frontend/src/index.css`: Extensive global stylesheet driving the application's unique Tactical Sci-Fi UI, managing CSS variables, animations, glassmorphism, tags, visual urgency glows, grids, and modal styles.
+- `frontend/src/main.jsx`: The JavaScript entry file responsible for mounting the React `App` component onto the `index.html` root element inside a `StrictMode` wrapper.
+- `frontend/src/pages/Dashboard.jsx`: The core interactive workspace for authenticated users allowing robust task CRUD functionality, searching, filtering, and displaying the gamified progress bar.
+- `frontend/src/pages/Login.jsx`: A view component presenting the user login form interface and facilitating the local storage of JWT tokens upon successful authentication.
+- `frontend/src/pages/Register.jsx`: A view component managing the registration flow to onboard new users into the platform.
+- `frontend/vite.config.js`: Setup configuration dictating how the Vite build tool and development server operate.
 
 ## Complete Project File and Folder Tree
 ```text
@@ -120,7 +129,11 @@ The application uses MongoDB via Mongoose, with two primary schemas:
 │   │   ├── App.css
 │   │   ├── App.jsx
 │   │   ├── assets
+│   │   │   ├── edit.png
 │   │   │   ├── hero.png
+│   │   │   ├── home.png
+│   │   │   ├── homelight.png
+│   │   │   ├── login.png
 │   │   │   ├── react.svg
 │   │   │   └── vite.svg
 │   │   ├── components
