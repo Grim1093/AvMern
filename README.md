@@ -103,21 +103,33 @@ By default, the Vite server will run on `http://localhost:5173`. Open this URL i
 
 ## 📸 Demo
 
-### Secure Authentication
-![Login Screen](frontend/src/assets/login.png)
-![Login Mobile](frontend/src/assets/loginMobile.png)
+### 🔐 Secure Authentication
 
-### Tactical Dashboard (Dark Mode)
-![Dark Mode Dashboard](frontend/src/assets/home.png)
-![Dark Mode Mobile](frontend/src/assets/homeMobile.png)
+<p align="center">
+  <img src="frontend/src/assets/login.png" alt="Login Desktop" width="650">
+  <img src="frontend/src/assets/loginMobile.png" alt="Login Mobile" width="220">
+</p>
 
-### Tactical Dashboard (Light Mode)
-![Light Mode Dashboard](frontend/src/assets/homelight.png)
-![Light Mode Mobile](frontend/src/assets/homeLightMobile.png)
+### 🌙 Tactical Dashboard (Dark Mode)
 
-### Mission Briefing (Edit Modal)
-![Edit Task Modal](frontend/src/assets/edit.png)
-![Edit Task Mobile](frontend/src/assets/editMobile.png)
+<p align="center">
+  <img src="frontend/src/assets/home.png" alt="Dashboard Dark Desktop" width="650">
+  <img src="frontend/src/assets/homeMobile.png" alt="Dashboard Dark Mobile" width="220">
+</p>
+
+### ☀️ Tactical Dashboard (Light Mode)
+
+<p align="center">
+  <img src="frontend/src/assets/homelight.png" alt="Dashboard Light Desktop" width="650">
+  <img src="frontend/src/assets/homeLightMobile.png" alt="Dashboard Light Mobile" width="220">
+</p>
+
+### ✏️ Mission Briefing (Edit Modal)
+
+<p align="center">
+  <img src="frontend/src/assets/edit.png" alt="Edit Modal Desktop" width="650">
+  <img src="frontend/src/assets/editMobile.png" alt="Edit Modal Mobile" width="220">
+</p>
 
 ---
 
